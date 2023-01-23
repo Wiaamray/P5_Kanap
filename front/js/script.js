@@ -9,8 +9,8 @@ function addproducts(array){  //addproducts va récuperer les données
 
 array.forEach((canape) => {
 
-const { id, imageUrl, altTxt, name, description} = canape
-const link = addlink(id)  // il va créer un id, article, image, h3, p
+const { _id, imageUrl, altTxt, name, description} = canape
+const link = addlink(_id)  // il va créer un id, article, image, h3, p
 const article = document.createElement("article")
 const image = addImage(imageUrl , altTxt)
 const h3 = addH3(name)
@@ -28,9 +28,9 @@ function appendElementToArticle(article, image, h3, p){
     article.appendChild(p)
 }
 
-function addlink(id){  // créer le lien
+function addlink(_id){  // créer le lien
     const link = document.createElement("a")
-    link.href  = "./product.html?id=" + id
+    link.href  = "./product.html?id=" + _id
     return link //sort link de la fonction
 }
 
