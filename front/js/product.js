@@ -1,12 +1,18 @@
+
 const paramsString = window.location.search;
 const urlParams = new URLSearchParams(paramsString)
 const productId = urlParams.get("id")
+console.log({productId})
 if(productId != null){
     let itemPrice = 0
+    let imgUrl, altText, articleName
 }
+
+
 fetch(`http://localhost:3000/api/products/${productId}`)
 .then((response) => response.json())
 .then((res) => getdata(res))
+
 
 function getdata(info){
 const altTxt = info.altTxt
@@ -15,13 +21,17 @@ const description =  info.description
 const imageUrl = info.imageUrl
 const name = info.name
 const _id = info._id
-
 itemPrice = info.price
+
+imgUrl= imageUrl
+altText = altTxt
+articleName = name
+
 
 addImage(imageUrl, altTxt)
 addTitle(name)
 addPrice(itemPrice)
-addDescription(description)
+addCartcontent(description)
 addColors(colors)
 }
 //Fonction pour création d'image
@@ -46,9 +56,9 @@ function addPrice(price){
     if (span!= null) span.textContent = price
 }
 
-//fonction pour récupérer la description
+//Fonction pour récupérer la description
 
-function addDescription(description){
+function addCartcontent(description){
 const p = document.querySelector("#description") 
 if (p!=null) p.textContent = description
 }
@@ -67,44 +77,101 @@ function addColors(colors){
     }
 }
 
-//Ajouter l'événement de click
-
+//Ajouter l'événement de click sur le bouton ajouter au panier
 const button = document.querySelector("#addToCart")
-if(button != null){
+button.addEventListener("click", Validation)
 
-    button.addEventListener("click", (e) => {
-const color = document.querySelector("#colors").value
-const quantity = document.querySelector("#quantity").value
+function Validation() {
+  const color = document.querySelector("#colors").value
+  const quantity = document.querySelector("#quantity").value
 
-if(color == null ||  color === "" || quantity == null || quantity == 0 || quantity<0 ) {
+  if (isOrderInvalid(color, quantity)) return
 
-    alert ("please select a valid color and quantity")
+  redirectToCart()
+}
+
+
+function isOrderInvalid(color, quantity) {
+if(color == null ||  color === "" ) {
+
+
+
+    alert ("please select a valid color ")
+
+    return }
+
+    if(quantity == null || quantity == 0 || quantity<= 0 || estEntier() === false ){
+
+        alert ("please select a valid number")
+
+        return 
     }
 
+   
+// verifier que le chiffre entré est un entier
+function estEntier() {
+    let quantite = Number(document.getElementById('quantity').value)
+    if (Number.isInteger(quantite)) {
+        return 
+      
+    }  isItemInCart()
+    return false
+}
+
+
+//function saveOrder(color, quantity){
 //fabriquer un objet (storer dans le localstorage)
-    const data = {
+const key = `${productId}-${color}`
+//il faut chercher dans le localstorage si la valeur de key déja existante
+//si cette valeur existe déjà il faut récupérer cette valeur et augmenter la quantité
+
+let monpanier = JSON.parse(localStorage.getItem("mon_panier"))
+//si le localstorage contient le key mon panier et si la valeur de cette dernière est un tableau
+  if(!monpanier || ! Array.isArray(monpanier)){
+   monpanier = []
+  }
+
+const existantvalue = monpanier.find(item => item.id == productId && item.color == color)
+if (existantvalue){
+  existantvalue.quantity = existantvalue.quantity + Number(quantity)
+
+localStorage.setItem("mon_panier", JSON.stringify (monpanier))
+
+return ;
+}
+
+const data = {
         id : productId,
         color: color,
         quantity: Number(quantity),
+        imageUrl: imgUrl,
+        altTxt : altText,
+        name: articleName,
+       //price: itemPrice
     }
-    
+//La fonction setItem permet d’écrire une valeur dans le localStorage   
 //save data to localstorage(stringify pour transformer en string) 
-localStorage.setItem(productId, JSON.stringify(data))
+//localStorage.setItem(key, JSON.stringify(data))
 
-
-
+ monpanier.push(data)
+ localStorage.setItem("mon_panier", JSON.stringify (monpanier) )
+//}
+}
 //redirection vers url page cart.html (url relative)
-
 //Condition avant la redirection vers l'url
-
-if(color == null ||  color === "" || quantity == null || quantity == 0 || quantity<0 ){
-return false}
-
-else{
-    window.location.href = "cart.html"
+function redirectToCart() {
+    //fenêtre pop-up
+ const popupConfirmation =() =>{
+   if(window.confirm(`Votre commande de ${quantity} ${articleName} ${color} est ajoutée au panier
+Pour consulter votre panier, cliquez sur OK`)){
+      
+   }
+}
+   window.location.href = "cart.html"
 }
 
 
-   
-    })
-}
+
+
+
+

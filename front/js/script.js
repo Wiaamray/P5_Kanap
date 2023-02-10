@@ -31,6 +31,7 @@ function appendElementToArticle(article, image, h3, p){
 function addlink(_id){  // créer le lien
     const link = document.createElement("a")
     link.href  = "./product.html?id=" + _id
+    console.log(link)
     return link //sort link de la fonction
 }
 
@@ -46,7 +47,7 @@ function appendChildren(link, article){ // Ici la fonction va chercher items et 
 
 
 function addImage(imageUrl , altTxt){
-    const image = document.createElement("img")//z  createElement  pour créer un noeud 
+    const image = document.createElement("img")// createElement  pour créer un noeud 
     image.src = imageUrl
     image.alt = altTxt
     return image 
